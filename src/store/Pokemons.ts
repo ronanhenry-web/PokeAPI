@@ -1,52 +1,39 @@
 import { defineStore } from 'pinia'
 import axios from '@/utils/axios'
 import type { Pokemon } from '@/models/Pokemon'
+import getRandomNumber from '@/utils/random'
 
 export const usePokemonStore = defineStore('pokemon', {
   state: () => {
     return {
       pokemons: [] as Pokemon[],
-      detailsPokemon: null as Pokemon | null,
     }
   },
+  getters: {
+    getPokemons: (state) => state.pokemons,
+    getPokemonById: (state) => (id: number) => {
+      return state.pokemons.find((pokemon) => pokemon.id === id)
+    },
+  },
+
   actions: {
-    generatePokemonImageUrl(id: number) {
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+    fetchWithRandom() {
+      for (let i = 1; i <= 10; i++) {
+        const randomId = getRandomNumber()
+        this.fetchPokemons(randomId)
+      }
     },
 
-    getPokemons() {
-      axios
-        .get('/pokemon')
+    fetchPokemons(id: number) {
+      return axios
+        .get(`/pokemon/${id}`)
         .then((response) => {
-          const shuffledPokemons = response.data.results.map((el: any) => {
-            const parts = el.url.split('/')
-            const id = parts[parts.length - 2]
-            return {
-              id,
-              name: el.name,
-              imgUrl: this.generatePokemonImageUrl(id),
-            } as Pokemon
+          this.pokemons.push({
+            id: id,
+            name: response.data.name,
+            imgUrl: response.data.sprites.front_default,
+            types: response.data.types.map((type: any) => type.type.name),
           })
-          shuffledPokemons.sort(() => Math.random() - 0.5)
-          this.pokemons = shuffledPokemons
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-
-    async getPokemonDetails(idP: number) {
-      await axios
-        .get(`/pokemon/${idP}`)
-        .then((response) => {
-          const { name, id, sprites, types } = response.data
-          console.log(response)
-          this.detailsPokemon = {
-            id,
-            name,
-            imgUrl: sprites.front_default,
-            types: types.map((el: any) => el.type.name),
-          } as Pokemon
         })
         .catch((error) => {
           console.log(error)

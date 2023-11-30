@@ -1,5 +1,5 @@
 import AccueilVue from '@/views/Accueil.vue'
-import PokemonDetail from '@/views/PokemonDetail.vue'
+import PokemonDetail from '@/views/PokemonDetails.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 export default createRouter({
@@ -9,6 +9,7 @@ export default createRouter({
     {
       path: '/pokemons/:id',
       name: 'PokemonRoute',
+      props: true,
       component: PokemonDetail,
     },
   ],

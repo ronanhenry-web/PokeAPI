@@ -1,4 +1,4 @@
-# Projet Vue.js
+# Projet PokeAPI
 
 Objectif se familiariser avec les slots, les components, les cards, Pinia, Axios, I18N et les promises
 
